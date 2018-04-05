@@ -38,28 +38,28 @@ func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 }
 
 type (
-	stackGKey struct {
-		top    *nodeGKey
+	stackGKeyXXGValue struct {
+		top    *stacknodefrbtNodeGKeyXXGValue
 		length int
 	}
-	nodeGKey struct {
-		value GKey
-		prev  *nodeGKey
+	stacknodefrbtNodeGKeyXXGValue struct {
+		value *frbtNodeGKeyXXGValue
+		prev  *stacknodefrbtNodeGKeyXXGValue
 	}
 )
 
 // Create a new stack
-func New() *stackGKey {
-	return &stackGKey{nil, 0}
+func New() *stackGKeyXXGValue {
+	return &stackGKeyXXGValue{nil, 0}
 }
 
 // Return the number of items in the stack
-func (this *stackGKey) Len() int {
+func (this *stackGKeyXXGValue) Len() int {
 	return this.length
 }
 
 // View the top item on the stack
-func (this *stackGKey) Peek() GKey {
+func (this *stackGKeyXXGValue) Peek() *frbtNodeGKeyXXGValue {
 	if this.length == 0 {
 		return nil
 	}
@@ -67,7 +67,7 @@ func (this *stackGKey) Peek() GKey {
 }
 
 // Pop the top item of the stack and return it
-func (this *stackGKey) Pop() GKey {
+func (this *stackGKeyXXGValue) Pop() *frbtNodeGKeyXXGValue {
 	if this.length == 0 {
 		return nil
 	}
@@ -79,8 +79,8 @@ func (this *stackGKey) Pop() GKey {
 }
 
 // Push a value onto the top of the stack
-func (this *stackGKey) Push(value GKey) {
-	n := &nodeGKey{value, this.top}
+func (this *stackGKeyXXGValue) Push(value *frbtNodeGKeyXXGValue) {
+	n := &stacknodefrbtNodeGKeyXXGValue{value, this.top}
 	this.top = n
 	this.length++
 }
