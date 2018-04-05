@@ -36,3 +36,51 @@ func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 		diversified: false,
 		compare:     t.compare}
 }
+
+type (
+	stackGKey struct {
+		top    *nodeGKey
+		length int
+	}
+	nodeGKey struct {
+		value GKey
+		prev  *nodeGKey
+	}
+)
+
+// Create a new stack
+func New() *stackGKey {
+	return &stackGKey{nil, 0}
+}
+
+// Return the number of items in the stack
+func (this *stackGKey) Len() int {
+	return this.length
+}
+
+// View the top item on the stack
+func (this *stackGKey) Peek() GKey {
+	if this.length == 0 {
+		return nil
+	}
+	return this.top.value
+}
+
+// Pop the top item of the stack and return it
+func (this *stackGKey) Pop() GKey {
+	if this.length == 0 {
+		return nil
+	}
+
+	n := this.top
+	this.top = n.prev
+	this.length--
+	return n.value
+}
+
+// Push a value onto the top of the stack
+func (this *stackGKey) Push(value GKey) {
+	n := &nodeGKey{value, this.top}
+	this.top = n
+	this.length++
+}
