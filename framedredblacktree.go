@@ -9,13 +9,13 @@ import (
 type GKey generic.Type
 type GValue generic.Type
 
-type FRBTKeyLessThan func(p1, p2 *GKey) bool
+type FRBTKeyLessThan func(p1, p2 GKey) bool
 
 type FRBTreeGKeyXXGValue struct {
 	root        *frbtNodeGKeyXXGValue
 	generation  uint64
 	diversified bool
-	compare     FRBTKeyLessThan
+	lessthan    FRBTKeyLessThan
 	size        int
 }
 
@@ -43,7 +43,7 @@ func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 		root:        t.root,
 		generation:  t.generation + 1,
 		diversified: false,
-		compare:     t.compare}
+		lessthan:    t.lessthan}
 }
 
 func (t *FRBTreeGKeyXXGValue) IsModifyAllowed() bool {
@@ -55,7 +55,44 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		return ErrModDiversifiedFRBTreeGKeyXXGValue
 	}
 
+	_, hierarchy := t.narrowto(key)
+
+	if hierarchy.Len() == 0 {
+		//Inserting first node
+	}
+
 	return nil
+}
+
+func (t *FRBTreeGKeyXXGValue) makeNode(color int) *frbtNodeGKeyXXGValue {
+	return &frbtNodeGKeyXXGValue{color: color, shift: t.generation}
+}
+
+/*narrow down to the nearest node
+  return true if exact match is found,
+              with an stack topped with result and parents hierarchy
+         false if no exact match is found,
+              with an stack topped with would be parents hierarchy
+*/
+func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) (bool, *stackGKeyXXGValue) {
+	hierarchystack := newstackGKeyXXGValue()
+	current := t.root
+	for {
+		if current == nil {
+			return false, hierarchystack
+		}
+		hierarchystack.Push(current)
+		if t.lessthan(key, current.key) {
+			current = current.left
+		} else {
+			if current.key == key {
+				hierarchystack.Push(current)
+				return true, hierarchystack
+			}
+			current = current.right
+		}
+	}
+
 }
 
 type (
