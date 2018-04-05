@@ -12,6 +12,7 @@ type FRBTreeGKeyXXGValue struct {
 	generation  uint64
 	diversified bool
 	compare     FRBTKeyLessThan
+	size        int
 }
 
 type frbtNodeGKeyXXGValue struct {
