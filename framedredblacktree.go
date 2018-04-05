@@ -1,6 +1,10 @@
 package framedredblacktree
 
-import "github.com/cheekybits/genny/generic"
+import (
+	"errors"
+
+	"github.com/cheekybits/genny/generic"
+)
 
 type GKey generic.Type
 type GValue generic.Type
@@ -29,6 +33,10 @@ const (
 	BLACK = 1
 )
 
+var (
+	ErrModDiversifiedFRBTreeGKeyXXGValue = errors.New("Modify a diversified FRBTreeGKeyXXGValue")
+)
+
 func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 	t.diversified = true
 	return &FRBTreeGKeyXXGValue{
@@ -36,6 +44,18 @@ func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 		generation:  t.generation + 1,
 		diversified: false,
 		compare:     t.compare}
+}
+
+func (t *FRBTreeGKeyXXGValue) IsModifyAllowed() bool {
+	return !t.diversified
+}
+
+func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
+	if !t.IsModifyAllowed() {
+		return ErrModDiversifiedFRBTreeGKeyXXGValue
+	}
+
+	return nil
 }
 
 type (
