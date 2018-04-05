@@ -57,15 +57,48 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 
 	_, hierarchy := t.narrowto(key)
 
+	t.size++
+
 	if hierarchy.Len() == 0 {
 		//Inserting first node
+		t.root = t.makeNode(BLACK, key, value)
+	} else {
+		inserting := t.makeNode(RED, key, value)
+		if t.lessthan(key, hierarchy.top.value.key) {
+
+		} else {
+
+		}
+
 	}
 
 	return nil
 }
 
-func (t *FRBTreeGKeyXXGValue) makeNode(color int) *frbtNodeGKeyXXGValue {
-	return &frbtNodeGKeyXXGValue{color: color, shift: t.generation}
+func (t *FRBTreeGKeyXXGValue) makeNode(color int, key GKey, value GValue) *frbtNodeGKeyXXGValue {
+	return &frbtNodeGKeyXXGValue{color: color, shift: t.generation, key: &key, value: &value}
+}
+
+func (t *FRBTreeGKeyXXGValue) dupNode(src *frbtNodeGKeyXXGValue) *frbtNodeGKeyXXGValue {
+	return &frbtNodeGKeyXXGValue{
+		color: src.color,
+		shift: t.generation,
+		key:   src.key,
+		value: src.value,
+		left:  src.left,
+		right: src.right,
+	}
+}
+
+func (t *FRBTreeGKeyXXGValue) isShifted(src *frbtNodeGKeyXXGValue) bool {
+	return src.shift != t.generation
+}
+
+func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *frbtNodeGKeyXXGValue {
+	if t.isShifted(src) {
+		return t.dupNode(src)
+	}
+	return src
 }
 
 /*narrow down to the nearest node
