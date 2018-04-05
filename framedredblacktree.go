@@ -49,7 +49,7 @@ type (
 )
 
 // Create a new stack
-func New() *stackGKeyXXGValue {
+func newstackGKeyXXGValue() *stackGKeyXXGValue {
 	return &stackGKeyXXGValue{nil, 0}
 }
 
