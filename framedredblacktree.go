@@ -35,6 +35,7 @@ const (
 
 var (
 	ErrModDiversifiedFRBTreeGKeyXXGValue = errors.New("Modify a diversified FRBTreeGKeyXXGValue")
+	ErrKeyNotFound                       = errors.New("Key not found")
 )
 
 func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
@@ -78,6 +79,18 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 }
 
 func (t *FRBTreeGKeyXXGValue) insertFixAscend(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+
+}
+
+func (t *FRBTreeGKeyXXGValue) deleteFixAscend(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+
+}
+
+func (t *FRBTreeGKeyXXGValue) leftRotate(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+
+}
+
+func (t *FRBTreeGKeyXXGValue) rightRotate(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
 
 }
 
@@ -150,17 +163,13 @@ func newstackGKeyXXGValue() *stackGKeyXXGValue {
 	return &stackGKeyXXGValue{nil, 0}
 }
 
+func forktackGKeyXXGValue(orig *stackGKeyXXGValue) *stackGKeyXXGValue {
+	return &stackGKeyXXGValue{orig.top, orig.length}
+}
+
 // Return the number of items in the stack
 func (this *stackGKeyXXGValue) Len() int {
 	return this.length
-}
-
-// View the top item on the stack
-func (this *stackGKeyXXGValue) Peek() *frbtNodeGKeyXXGValue {
-	if this.length == 0 {
-		return nil
-	}
-	return this.top.value
 }
 
 // Pop the top item of the stack and return it
