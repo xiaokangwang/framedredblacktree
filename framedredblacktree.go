@@ -94,6 +94,10 @@ func (t *FRBTreeGKeyXXGValue) rightRotate(current *frbtNodeGKeyXXGValue, hierarc
 
 }
 
+func (t *FRBTreeGKeyXXGValue) transplant(u *frbtNodeGKeyXXGValue, uhierarchy *stackGKeyXXGValue, v *frbtNodeGKeyXXGValue, vhierarchy *stackGKeyXXGValue) {
+
+}
+
 func (t *FRBTreeGKeyXXGValue) makeNode(color int, key GKey, value GValue) *frbtNodeGKeyXXGValue {
 	return &frbtNodeGKeyXXGValue{color: color, shift: t.generation, key: &key, value: &value}
 }
