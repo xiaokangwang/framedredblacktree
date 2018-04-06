@@ -28,6 +28,11 @@ type frbtNodeGKeyXXGValue struct {
 	value *GValue
 }
 
+type frbtAnchorGKeyXXGValue struct {
+	at        *frbtNodeGKeyXXGValue
+	hierarchy *stackGKeyXXGValue
+}
+
 const (
 	RED   = 0
 	BLACK = 1
@@ -56,45 +61,58 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		return ErrModDiversifiedFRBTreeGKeyXXGValue
 	}
 
-	_, hierarchy := t.narrowto(key)
+	anchor := t.narrowto(key)
 
 	t.size++
 
-	if hierarchy.Len() == 0 {
+	if anchor.hierarchy.Len() == 0 {
 		//Inserting first node
 		t.root = t.makeNode(BLACK, key, value)
 	} else {
 		inserting := t.makeNode(RED, key, value)
-		parent := t.guaranteeWriteAccess(hierarchy.Pop())
+		parent := t.guaranteeWriteAccess(anchor.hierarchy.Pop())
 		if t.lessthan(key, parent.key) {
 			parent.left = inserting
 		} else {
 			parent.right = inserting
 		}
-		t.insertFixAscend(inserting, hierarchy)
+		anchor.hierarchy.Push(parent)
+		anchor.at = inserting
+		t.insertFixAscend(anchor)
 
 	}
 
 	return nil
 }
 
-func (t *FRBTreeGKeyXXGValue) insertFixAscend(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) insertFixAscend(anchor frbtAnchorGKeyXXGValue) {
 
 }
 
-func (t *FRBTreeGKeyXXGValue) deleteFixAscend(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) deleteFixAscend(anchor frbtAnchorGKeyXXGValue) {
 
 }
 
-func (t *FRBTreeGKeyXXGValue) leftRotate(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) leftRotate(anchor frbtAnchorGKeyXXGValue) {
 
 }
 
-func (t *FRBTreeGKeyXXGValue) rightRotate(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) rightRotate(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+	qGrave := t.guaranteeWriteAccess(anchor.at)
+	pGrave := t.guaranteeWriteAccess(anchor.at.left)
 
+	b := anchor.at.right
+
+	pGrave.right = qGrave
+	qGrave.left = b
+
+	anchor.hierarchy.Push(pGrave)
+	anchor.at = qGrave
+
+	return anchor
 }
 
-func (t *FRBTreeGKeyXXGValue) transplant(u *frbtNodeGKeyXXGValue, uhierarchy *stackGKeyXXGValue, v *frbtNodeGKeyXXGValue, vhierarchy *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) transplant(u frbtAnchorGKeyXXGValue, v frbtAnchorGKeyXXGValue) {
 
 }
 
@@ -130,20 +148,19 @@ func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *f
          false if no exact match is found,
               with an stack topped with would be parents hierarchy
 */
-func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) (bool, *stackGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
 	hierarchystack := newstackGKeyXXGValue()
 	current := t.root
 	for {
 		if current == nil {
-			return false, hierarchystack
+			return frbtAnchorGKeyXXGValue{at: nil, hierarchy: hierarchystack}
 		}
 		hierarchystack.Push(current)
 		if t.lessthan(key, current.key) {
 			current = current.left
 		} else {
 			if current.key == key {
-				hierarchystack.Push(current)
-				return true, hierarchystack
+				return frbtAnchorGKeyXXGValue{at: current, hierarchy: hierarchystack}
 			}
 			current = current.right
 		}
