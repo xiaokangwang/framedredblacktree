@@ -167,8 +167,15 @@ func newstackGKeyXXGValue() *stackGKeyXXGValue {
 	return &stackGKeyXXGValue{nil, 0}
 }
 
-func forktackGKeyXXGValue(orig *stackGKeyXXGValue) *stackGKeyXXGValue {
-	return &stackGKeyXXGValue{orig.top, orig.length}
+func (this *stackGKeyXXGValue) Fork() *stackGKeyXXGValue {
+	return &stackGKeyXXGValue{this.top, this.length}
+}
+
+func (this *stackGKeyXXGValue) Peek() *frbtNodeGKeyXXGValue {
+	if this.length == 0 {
+		return nil
+	}
+	return this.top.value
 }
 
 // Return the number of items in the stack
