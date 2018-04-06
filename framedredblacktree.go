@@ -109,6 +109,17 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 					reduncle(uncle)
 					continue
 				}
+				if anchor.at == parent.right {
+					anchor.hierarchy.Push(grandparent)
+					anchor.at = parent
+					t.leftRotateM(anchor)
+					parent = anchor.hierarchy.Pop()
+					grandparent = anchor.hierarchy.Pop()
+				}
+				parent.color = BLACK
+				grandparent.color = RED
+				anchor.at = grandparent
+				t.rightRotateM(anchor)
 			}
 
 		} else if parent == grandparent.right {
@@ -119,6 +130,17 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 					reduncle(uncle)
 					continue
 				}
+				if anchor.at == parent.left {
+					anchor.hierarchy.Push(grandparent)
+					anchor.at = parent
+					t.rightRotateM(anchor)
+					parent = anchor.hierarchy.Pop()
+					grandparent = anchor.hierarchy.Pop()
+				}
+				parent.color = BLACK
+				grandparent.color = RED
+				anchor.at = grandparent
+				t.leftRotateM(anchor)
 			}
 
 		} else {
