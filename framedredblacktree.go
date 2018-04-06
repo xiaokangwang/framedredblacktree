@@ -2,6 +2,7 @@ package framedredblacktree
 
 import (
 	"errors"
+	"runtime"
 
 	"github.com/cheekybits/genny/generic"
 )
@@ -90,7 +91,39 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 	t.guaranteeAncestorsWriteAccess(anchor)
 
 	for anchor.hierarchy.Len() != 0 && anchor.hierarchy.Peek().color == RED {
+		//small parent or big parent?
+		parent := anchor.hierarchy.Pop()
+		grandparent := anchor.hierarchy.Pop()
+		var uncle *frbtNodeGKeyXXGValue
+		reduncle := func(uncle *frbtNodeGKeyXXGValue) {
+			parent.color = BLACK
+			uncle.color = BLACK
+			grandparent.color = RED
+			anchor.at = grandparent
+		}
+		if parent == grandparent.left {
+			if grandparent.right != nil {
+				uncle = t.guaranteeWriteAccess(grandparent.right)
+				grandparent.right = uncle
+				if uncle.color == RED {
+					reduncle(uncle)
+					continue
+				}
+			}
 
+		} else if parent == grandparent.right {
+			if grandparent.left != nil {
+				uncle = t.guaranteeWriteAccess(grandparent.left)
+				grandparent.left = uncle
+				if uncle.color == RED {
+					reduncle(uncle)
+					continue
+				}
+			}
+
+		} else {
+			runtime.Breakpoint()
+		}
 	}
 
 	t.root.color = BLACK
@@ -176,7 +209,7 @@ checkfor:
 		} else if old.right == current {
 			new.right = current
 		} else {
-			panic("Desync")
+			runtime.Breakpoint()
 		}
 		updatestack.Push(new)
 	}
