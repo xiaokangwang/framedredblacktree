@@ -86,6 +86,10 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 	return nil
 }
 
+func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
+
+}
+
 func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 	//https://www.geeksforgeeks.org/red-black-tree-set-2-insert/ step 3
 	t.guaranteeAncestorsWriteAccess(anchor)
@@ -120,6 +124,7 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 				grandparent.color = RED
 				anchor.at = grandparent
 				t.rightRotateM(anchor)
+				break
 			}
 
 		} else if parent == grandparent.right {
@@ -141,6 +146,7 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 				grandparent.color = RED
 				anchor.at = grandparent
 				t.leftRotateM(anchor)
+				break
 			}
 
 		} else {
