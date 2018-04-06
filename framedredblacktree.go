@@ -146,6 +146,37 @@ func (t *FRBTreeGKeyXXGValue) isShifted(src *frbtNodeGKeyXXGValue) bool {
 	return src.shift != t.generation
 }
 
+func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a *frbtAnchorGKeyXXGValue) {
+	updatestack := stackGKeyXXGValue{}
+	current := a.at
+
+checkfor:
+	for {
+		if a.hierarchy.Len() != 0 {
+			t.root = current
+			break checkfor
+		}
+		old := a.hierarchy.Pop()
+		if !t.isShifted(old) {
+			break checkfor
+		}
+		new := t.dupNode(old)
+		if old.left == current {
+			new.left = current
+		} else if old.right == current {
+			new.right = current
+		} else {
+			panic("Desync")
+		}
+		updatestack.Push(new)
+	}
+
+	for updatestack.Len() != 0 {
+		a.hierarchy.Push(updatestack.Pop())
+	}
+
+}
+
 func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *frbtNodeGKeyXXGValue {
 	if t.isShifted(src) {
 		return t.dupNode(src)
