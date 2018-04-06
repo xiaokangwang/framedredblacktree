@@ -93,7 +93,18 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscend(anchor frbtAnchorGKeyXXGValue) {
 
 }
 
-func (t *FRBTreeGKeyXXGValue) leftRotate(anchor frbtAnchorGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) leftRotate(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+	pGrave := t.guaranteeWriteAccess(anchor.at)
+	qGrave := t.guaranteeWriteAccess(anchor.at.right)
+
+	b := anchor.at.right.left
+
+	pGrave.right = b
+	qGrave.left = pGrave
+
+	anchor.hierarchy.Push(qGrave)
+
+	return anchor
 
 }
 
@@ -101,7 +112,7 @@ func (t *FRBTreeGKeyXXGValue) rightRotate(anchor frbtAnchorGKeyXXGValue) frbtAnc
 	qGrave := t.guaranteeWriteAccess(anchor.at)
 	pGrave := t.guaranteeWriteAccess(anchor.at.left)
 
-	b := anchor.at.right
+	b := anchor.at.left.right
 
 	pGrave.right = qGrave
 	qGrave.left = b
