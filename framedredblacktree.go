@@ -94,6 +94,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscend(anchor frbtAnchorGKeyXXGValue) {
 }
 
 func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+	t.guaranteeAncestorsWriteAccess(anchor)
 	pGrave := t.guaranteeWriteAccess(anchor.at)
 	qGrave := t.guaranteeWriteAccess(anchor.at.right)
 
@@ -109,6 +110,7 @@ func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnc
 }
 
 func (t *FRBTreeGKeyXXGValue) rightRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+	t.guaranteeAncestorsWriteAccess(anchor)
 	qGrave := t.guaranteeWriteAccess(anchor.at)
 	pGrave := t.guaranteeWriteAccess(anchor.at.left)
 
@@ -146,7 +148,7 @@ func (t *FRBTreeGKeyXXGValue) isShifted(src *frbtNodeGKeyXXGValue) bool {
 	return src.shift != t.generation
 }
 
-func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a *frbtAnchorGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a frbtAnchorGKeyXXGValue) {
 	updatestack := stackGKeyXXGValue{}
 	current := a.at
 
