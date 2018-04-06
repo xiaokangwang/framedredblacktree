@@ -64,15 +64,21 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		t.root = t.makeNode(BLACK, key, value)
 	} else {
 		inserting := t.makeNode(RED, key, value)
-		if t.lessthan(key, hierarchy.top.value.key) {
-
+		parent := t.guaranteeWriteAccess(hierarchy.Pop())
+		if t.lessthan(key, parent.key) {
+			parent.left = inserting
 		} else {
-
+			parent.right = inserting
 		}
+		t.insertFixAscend(inserting, hierarchy)
 
 	}
 
 	return nil
+}
+
+func (t *FRBTreeGKeyXXGValue) insertFixAscend(current *frbtNodeGKeyXXGValue, hierarchy *stackGKeyXXGValue) {
+
 }
 
 func (t *FRBTreeGKeyXXGValue) makeNode(color int, key GKey, value GValue) *frbtNodeGKeyXXGValue {
