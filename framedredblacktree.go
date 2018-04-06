@@ -86,7 +86,7 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 }
 
 func (t *FRBTreeGKeyXXGValue) insertFixAscend(anchor frbtAnchorGKeyXXGValue) {
-
+	//https://www.geeksforgeeks.org/red-black-tree-set-2-insert/ step 3
 }
 
 func (t *FRBTreeGKeyXXGValue) deleteFixAscend(anchor frbtAnchorGKeyXXGValue) {
