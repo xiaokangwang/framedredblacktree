@@ -95,6 +95,32 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		return ErrKeyNotFound
 	}
 
+	if anchor.at.left == nil {
+		replacedOrigColor := effectiveColor(anchor.at)
+		replacing := anchor.at.right
+		t.replacetreeelement(anchor, replacing)
+		if replacedOrigColor == BLACK {
+			t.insertFixAscendD(anchor)
+		}
+
+	} else if anchor.at.right == nil {
+		replacedOrigColor := effectiveColor(anchor.at)
+		replacing := anchor.at.left
+		t.replacetreeelement(anchor, replacing)
+		if replacedOrigColor == BLACK {
+			t.insertFixAscendD(anchor)
+		}
+	} else {
+
+	}
+
+}
+
+func effectiveColor(v *frbtNodeGKeyXXGValue) int {
+	if v == nil {
+		return BLACK
+	}
+	return v.color
 }
 
 func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
