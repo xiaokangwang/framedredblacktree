@@ -87,6 +87,13 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 }
 
 func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
+	if !t.IsModifyAllowed() {
+		return ErrModDiversifiedFRBTreeGKeyXXGValue
+	}
+	anchor := t.narrowto(key)
+	if anchor.at == nil {
+		return ErrKeyNotFound
+	}
 
 }
 
@@ -194,8 +201,20 @@ func (t *FRBTreeGKeyXXGValue) rightRotateM(anchor frbtAnchorGKeyXXGValue) frbtAn
 	return anchor
 }
 
-func (t *FRBTreeGKeyXXGValue) transplant(u frbtAnchorGKeyXXGValue, v frbtAnchorGKeyXXGValue) {
-
+func (t *FRBTreeGKeyXXGValue) replacetreeelement(u frbtAnchorGKeyXXGValue, v *frbtNodeGKeyXXGValue) {
+	if u.hierarchy.Len() == 0 {
+		t.root = v
+	} else if u.hierarchy.Peek().left == u.at {
+		up := u.hierarchy.Pop()
+		up = t.guaranteeWriteAccess(up)
+		up.left = v
+		u.hierarchy.Push(up)
+	} else {
+		up := u.hierarchy.Pop()
+		up = t.guaranteeWriteAccess(up)
+		up.right = v
+		u.hierarchy.Push(up)
+	}
 }
 
 func (t *FRBTreeGKeyXXGValue) makeNode(color int, key GKey, value GValue) *frbtNodeGKeyXXGValue {
