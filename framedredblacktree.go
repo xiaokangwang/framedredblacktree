@@ -44,6 +44,10 @@ var (
 	ErrKeyNotFoundGKeyXXGValue           = errors.New("Key not found")
 )
 
+func NewFRBTreeGKeyXXGValue(lessfunc FRBTKeyLessThanGKey) *FRBTreeGKeyXXGValue {
+	return &FRBTreeGKeyXXGValue{lessthan: lessfunc}
+}
+
 func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
 	t.diversified = true
 	return &FRBTreeGKeyXXGValue{
