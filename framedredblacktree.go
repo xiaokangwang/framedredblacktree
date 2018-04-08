@@ -111,12 +111,26 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 			t.insertFixAscendD(anchor)
 		}
 	} else {
-
+		hifork := anchor.hierarchy.Fork()
+		hifork.Push(anchor.at)
+		anchorfork := &frbtAnchorGKeyXXGValue{at: anchor.at.right, hierarchy: hifork}
+		min := treemin(anchorfork)
+		replacedOrigColor := effectiveColor(min.at)
+		replacing := min.at.right
+		t.guaranteeAncestorsWriteAccess(*min)
+		anchor.at.key = min.at.key
+		anchor.at.value = min.at.value
+		t.replacetreeelement(*min, replacing)
+		if replacedOrigColor == BLACK {
+			t.deleteFixAscendD(anchor)
+		}
 	}
 
+	t.size--
+	return nil
 }
 
-func treemin(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+func treemin(anchor *frbtAnchorGKeyXXGValue) *frbtAnchorGKeyXXGValue {
 
 	for anchor.at.left != nil {
 		anchor.hierarchy.Push(anchor.at)
@@ -237,6 +251,7 @@ func (t *FRBTreeGKeyXXGValue) rightRotateM(anchor frbtAnchorGKeyXXGValue) frbtAn
 }
 
 func (t *FRBTreeGKeyXXGValue) replacetreeelement(u frbtAnchorGKeyXXGValue, v *frbtNodeGKeyXXGValue) {
+	t.guaranteeAncestorsWriteAccess(u)
 	if u.hierarchy.Len() == 0 {
 		t.root = v
 	} else if u.hierarchy.Peek().left == u.at {
