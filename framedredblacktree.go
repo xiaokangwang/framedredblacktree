@@ -10,13 +10,13 @@ import (
 type GKey generic.Type
 type GValue generic.Type
 
-type FRBTKeyLessThanGKey func(p1, p2 GKey) bool
+type FRBTKeyLessGKeyXXGValue func(p1, p2 GKey) bool
 
 type FRBTreeGKeyXXGValue struct {
 	root        *frbtNodeGKeyXXGValue
 	generation  uint64
 	diversified bool
-	lessthan    FRBTKeyLessThanGKey
+	lessthan    FRBTKeyLessGKeyXXGValue
 	size        int
 }
 
@@ -44,7 +44,7 @@ var (
 	ErrKeyNotFoundGKeyXXGValue           = errors.New("Key not found")
 )
 
-func NewFRBTreeGKeyXXGValue(lessfunc FRBTKeyLessThanGKey) *FRBTreeGKeyXXGValue {
+func NewFRBTreeGKeyXXGValue(lessfunc FRBTKeyLessGKeyXXGValue) *FRBTreeGKeyXXGValue {
 	return &FRBTreeGKeyXXGValue{lessthan: lessfunc}
 }
 
