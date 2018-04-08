@@ -7,7 +7,8 @@ import (
 	"github.com/cheekybits/genny/generic"
 )
 
-type GKey generic.Type
+//type GKey generic.Type
+type GKey uint
 type GValue generic.Type
 
 type FRBTKeyLessGKeyXXGValue func(p1, p2 GKey) bool
@@ -382,7 +383,7 @@ func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a frbtAnchorGKeyXXGV
 
 checkfor:
 	for {
-		if a.hierarchy.Len() != 0 {
+		if a.hierarchy.Len() == 0 {
 			t.root = current
 			break checkfor
 		}
@@ -431,7 +432,7 @@ func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
 		if t.lessthan(key, *current.key) {
 			current = current.left
 		} else {
-			if current.key == key {
+			if *current.key == key {
 				return frbtAnchorGKeyXXGValue{at: current, hierarchy: hierarchystack}
 			}
 			current = current.right
