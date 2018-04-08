@@ -186,19 +186,19 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 					reduncle(uncle)
 					continue
 				}
-				if anchor.at == parent.right {
-					anchor.hierarchy.Push(grandparent)
-					anchor.at = parent
-					t.leftRotateM(anchor)
-					parent = anchor.hierarchy.Pop()
-					grandparent = anchor.hierarchy.Pop()
-				}
-				parent.color = BLACK
-				grandparent.color = RED
-				anchor.at = grandparent
-				t.rightRotateM(anchor)
-				break
 			}
+			if anchor.at == parent.right {
+				anchor.hierarchy.Push(grandparent)
+				anchor.at = parent
+				t.leftRotateM(anchor)
+				parent = anchor.hierarchy.Pop()
+				grandparent = anchor.hierarchy.Pop()
+			}
+			parent.color = BLACK
+			grandparent.color = RED
+			anchor.at = grandparent
+			t.rightRotateM(anchor)
+			break
 
 		} else if parent == grandparent.right {
 			if grandparent.left != nil {
@@ -208,19 +208,19 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 					reduncle(uncle)
 					continue
 				}
-				if anchor.at == parent.left {
-					anchor.hierarchy.Push(grandparent)
-					anchor.at = parent
-					t.rightRotateM(anchor)
-					parent = anchor.hierarchy.Pop()
-					grandparent = anchor.hierarchy.Pop()
-				}
-				parent.color = BLACK
-				grandparent.color = RED
-				anchor.at = grandparent
-				t.leftRotateM(anchor)
-				break
 			}
+			if anchor.at == parent.left {
+				anchor.hierarchy.Push(grandparent)
+				anchor.at = parent
+				t.rightRotateM(anchor)
+				parent = anchor.hierarchy.Pop()
+				grandparent = anchor.hierarchy.Pop()
+			}
+			parent.color = BLACK
+			grandparent.color = RED
+			anchor.at = grandparent
+			t.leftRotateM(anchor)
+			break
 
 		} else {
 			runtime.Breakpoint()
@@ -318,6 +318,15 @@ func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnc
 
 	pGrave.right = b
 	qGrave.left = pGrave
+	if anchor.hierarchy.Len() == 0 {
+		t.root = qGrave
+	} else {
+		if anchor.hierarchy.Peek().left == anchor.at {
+			anchor.hierarchy.Peek().left = pGrave
+		} else {
+			anchor.hierarchy.Peek().right = pGrave
+		}
+	}
 
 	anchor.hierarchy.Push(qGrave)
 
@@ -334,6 +343,16 @@ func (t *FRBTreeGKeyXXGValue) rightRotateM(anchor frbtAnchorGKeyXXGValue) frbtAn
 
 	pGrave.right = qGrave
 	qGrave.left = b
+
+	if anchor.hierarchy.Len() == 0 {
+		t.root = qGrave
+	} else {
+		if anchor.hierarchy.Peek().left == anchor.at {
+			anchor.hierarchy.Peek().left = qGrave
+		} else {
+			anchor.hierarchy.Peek().right = qGrave
+		}
+	}
 
 	anchor.hierarchy.Push(pGrave)
 	anchor.at = qGrave
