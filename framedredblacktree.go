@@ -116,6 +116,15 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 
 }
 
+func treemin(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
+
+	for anchor.at.left != nil {
+		anchor.hierarchy.Push(anchor.at)
+		anchor.at = anchor.at.left
+	}
+	return anchor
+}
+
 func effectiveColor(v *frbtNodeGKeyXXGValue) int {
 	if v == nil {
 		return BLACK
