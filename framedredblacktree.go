@@ -389,6 +389,7 @@ checkfor:
 		}
 		old := a.hierarchy.Pop()
 		if !t.isShifted(old) {
+			a.hierarchy.Push(old)
 			break checkfor
 		}
 		new := t.dupNode(old)
