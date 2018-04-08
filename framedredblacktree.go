@@ -10,13 +10,13 @@ import (
 type GKey generic.Type
 type GValue generic.Type
 
-type FRBTKeyLessThan func(p1, p2 GKey) bool
+type FRBTKeyLessThanGKey func(p1, p2 GKey) bool
 
 type FRBTreeGKeyXXGValue struct {
 	root        *frbtNodeGKeyXXGValue
 	generation  uint64
 	diversified bool
-	lessthan    FRBTKeyLessThan
+	lessthan    FRBTKeyLessThanGKey
 	size        int
 }
 
@@ -41,7 +41,7 @@ const (
 
 var (
 	ErrModDiversifiedFRBTreeGKeyXXGValue = errors.New("Modify a diversified FRBTreeGKeyXXGValue")
-	ErrKeyNotFound                       = errors.New("Key not found")
+	ErrKeyNotFoundGKeyXXGValue           = errors.New("Key not found")
 )
 
 func (t *FRBTreeGKeyXXGValue) Diversify() *FRBTreeGKeyXXGValue {
@@ -92,7 +92,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 	}
 	anchor := t.narrowto(key)
 	if anchor.at == nil {
-		return ErrKeyNotFound
+		return ErrKeyNotFoundGKeyXXGValue
 	}
 	t.guaranteeAncestorsWriteAccess(anchor)
 
