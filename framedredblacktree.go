@@ -100,7 +100,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		replacing := anchor.at.right
 		t.replacetreeelement(anchor, replacing)
 		if replacedOrigColor == BLACK {
-			t.insertFixAscendD(anchor)
+			t.deleteFixAscendD(anchor, anchor.hierarchy.Peek())
 		}
 
 	} else if anchor.at.right == nil {
@@ -108,7 +108,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		replacing := anchor.at.left
 		t.replacetreeelement(anchor, replacing)
 		if replacedOrigColor == BLACK {
-			t.insertFixAscendD(anchor)
+			t.deleteFixAscendD(anchor, anchor.hierarchy.Peek())
 		}
 	} else {
 		hifork := anchor.hierarchy.Fork()
@@ -117,12 +117,16 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		min := treemin(anchorfork)
 		replacedOrigColor := effectiveColor(min.at)
 		replacing := min.at.right
+		replacedP := anchor.hierarchy.Peek()
+		if min.hierarchy.Peek() == anchor.at && min.at.right == nil {
+			replacedP = min.at
+		}
 		t.guaranteeAncestorsWriteAccess(*min)
 		anchor.at.key = min.at.key
 		anchor.at.value = min.at.value
 		t.replacetreeelement(*min, replacing)
 		if replacedOrigColor == BLACK {
-			t.deleteFixAscendD(anchor)
+			t.deleteFixAscendD(anchor, replacedP)
 		}
 	}
 
@@ -213,8 +217,8 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 	t.root.color = BLACK
 }
 
-func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue) {
-
+func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, replacingParent *frbtNodeGKeyXXGValue) {
+	//Arg 1 replacing, arg2 replaced parent
 	t.guaranteeAncestorsWriteAccess(anchor)
 }
 
