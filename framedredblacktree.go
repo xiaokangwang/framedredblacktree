@@ -76,7 +76,7 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 	} else {
 		inserting := t.makeNode(RED, key, value)
 		parent := t.guaranteeWriteAccess(anchor.hierarchy.Pop())
-		if t.lessthan(key, parent.key) {
+		if t.lessthan(key, *parent.key) {
 			parent.left = inserting
 		} else {
 			parent.right = inserting
@@ -428,7 +428,7 @@ func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
 			return frbtAnchorGKeyXXGValue{at: nil, hierarchy: hierarchystack}
 		}
 		hierarchystack.Push(current)
-		if t.lessthan(key, current.key) {
+		if t.lessthan(key, *current.key) {
 			current = current.left
 		} else {
 			if current.key == key {
