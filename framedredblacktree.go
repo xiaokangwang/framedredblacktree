@@ -94,13 +94,16 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 	if anchor.at == nil {
 		return ErrKeyNotFound
 	}
+	t.guaranteeAncestorsWriteAccess(anchor)
 
 	if anchor.at.left == nil {
 		replacedOrigColor := effectiveColor(anchor.at)
 		replacing := anchor.at.right
 		t.replacetreeelement(anchor, replacing)
 		if replacedOrigColor == BLACK {
-			t.deleteFixAscendD(anchor, anchor.hierarchy.Peek())
+			hf := anchor.hierarchy.Fork()
+			anchorP := frbtAnchorGKeyXXGValue{at: hf.Pop(), hierarchy: hf}
+			t.deleteFixAscendD(anchor, anchorP)
 		}
 
 	} else if anchor.at.right == nil {
@@ -108,7 +111,9 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		replacing := anchor.at.left
 		t.replacetreeelement(anchor, replacing)
 		if replacedOrigColor == BLACK {
-			t.deleteFixAscendD(anchor, anchor.hierarchy.Peek())
+			hf := anchor.hierarchy.Fork()
+			anchorP := frbtAnchorGKeyXXGValue{at: hf.Pop(), hierarchy: hf}
+			t.deleteFixAscendD(anchor, anchorP)
 		}
 	} else {
 		hifork := anchor.hierarchy.Fork()
@@ -117,16 +122,19 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		min := treemin(anchorfork)
 		replacedOrigColor := effectiveColor(min.at)
 		replacing := min.at.right
-		replacedP := anchor.hierarchy.Peek()
+
+		hf := anchor.hierarchy.Fork()
+		anchorP := frbtAnchorGKeyXXGValue{at: hf.Pop(), hierarchy: hf}
+
 		if min.hierarchy.Peek() == anchor.at && min.at.right == nil {
-			replacedP = min.at
+			anchorP = *min
 		}
 		t.guaranteeAncestorsWriteAccess(*min)
 		anchor.at.key = min.at.key
 		anchor.at.value = min.at.value
 		t.replacetreeelement(*min, replacing)
 		if replacedOrigColor == BLACK {
-			t.deleteFixAscendD(anchor, replacedP)
+			t.deleteFixAscendD(anchor, anchorP)
 		}
 	}
 
@@ -217,9 +225,83 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 	t.root.color = BLACK
 }
 
-func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, replacingParent *frbtNodeGKeyXXGValue) {
+func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, replacingParent frbtAnchorGKeyXXGValue) {
 	//Arg 1 replacing, arg2 replaced parent
 	t.guaranteeAncestorsWriteAccess(anchor)
+
+	for anchor.at != t.root && effectiveColor(anchor.at) == BLACK {
+		if anchor.at != nil {
+			replacingParent.at = anchor.hierarchy.Peek()
+		}
+		if anchor.at == replacingParent.at.left {
+			sibling := replacingParent.at.right
+			sibling = t.guaranteeWriteAccess(sibling)
+			replacingParent.at.right = sibling
+			if sibling.color == RED {
+				sibling.color = BLACK
+				replacingParent.at.color = RED
+				t.leftRotateM(replacingParent)
+				sibling = replacingParent.at.right
+			}
+
+			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
+				sibling.color = RED
+				anchor = replacingParent
+			} else {
+				if effectiveColor(sibling.right) == BLACK {
+					if sibling.left != nil {
+						sibling.left.color = BLACK
+					}
+					sibling.color = RED
+					replacingParent.hierarchy.Push(replacingParent.at)
+					replacingParent.at = sibling
+					t.rightRotateM(replacingParent)
+					sibling = replacingParent.at.right
+				}
+				sibling.color = replacingParent.at.color
+				replacingParent.at.color = BLACK
+				if sibling.right != nil {
+					sibling.right.color = BLACK
+				}
+				t.leftRotateM(replacingParent)
+				break
+			}
+		} else {
+			sibling := replacingParent.at.left
+			sibling = t.guaranteeWriteAccess(sibling)
+			replacingParent.at.left = sibling
+			if sibling.color == RED {
+				sibling.color = BLACK
+				replacingParent.at.color = RED
+				t.rightRotateM(replacingParent)
+				sibling = replacingParent.at.left
+			}
+
+			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
+				sibling.color = RED
+				anchor = replacingParent
+			} else {
+				if effectiveColor(sibling.left) == BLACK {
+					if sibling.right != nil {
+						sibling.right.color = BLACK
+					}
+					sibling.color = RED
+					replacingParent.hierarchy.Push(replacingParent.at)
+					replacingParent.at = sibling
+					t.leftRotateM(replacingParent)
+					sibling = replacingParent.at.left
+				}
+				sibling.color = replacingParent.at.color
+				replacingParent.at.color = BLACK
+				if sibling.left != nil {
+					sibling.left.color = BLACK
+				}
+				t.rightRotateM(replacingParent)
+				break
+			}
+		}
+	}
+
 }
 
 func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
