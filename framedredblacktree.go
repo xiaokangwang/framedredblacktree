@@ -435,6 +435,14 @@ func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *f
 	return src
 }
 
+func (t *FRBTreeGKeyXXGValue) Get(key GKey) (GValue, error) {
+	result := t.narrowto(key)
+	if result.at == nil {
+		return nil, ErrKeyNotFoundGKeyXXGValue
+	}
+	return result.at.value, nil
+}
+
 /*narrow down to the nearest node
   return true if exact match is found,
               with an stack topped with result and parents hierarchy
