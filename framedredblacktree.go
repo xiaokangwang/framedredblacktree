@@ -109,9 +109,9 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		replacing := anchor.at.right
 		t.replacetreeelement(&anchor, replacing)
 		if replacedOrigColor == BLACK {
-			hf := anchor.hierarchy.Fork()
-			anchorP := frbtAnchorGKeyXXGValue{at: hf.Pop(), hierarchy: hf}
-			t.deleteFixAscendD(anchor, anchorP)
+			//hf := anchor.hierarchy.Fork()
+			//anchorP := frbtAnchorGKeyXXGValue{at: hf.Pop(), hierarchy: hf}
+			t.deleteFixAscendD(anchor, anchor)
 		}
 
 	} else if anchor.at.right == nil {
@@ -271,6 +271,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				if sibling.right != nil {
 					sibling.right.color = BLACK
 				}
+				replacingParent.hierarchy.Pop()
 				t.leftRotateM(replacingParent)
 
 			}
@@ -304,6 +305,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				if sibling.left != nil {
 					sibling.left.color = BLACK
 				}
+				replacingParent.hierarchy.Pop()
 				t.rightRotateM(replacingParent)
 
 			}
@@ -373,11 +375,13 @@ func (t *FRBTreeGKeyXXGValue) replacetreeelement(u *frbtAnchorGKeyXXGValue, v *f
 		up := u.hierarchy.Pop()
 		up = t.guaranteeWriteAccess(up)
 		up.left = v
+		u.hierarchy.Push(up)
 		u.lastremove = left
 	} else {
 		up := u.hierarchy.Pop()
 		up = t.guaranteeWriteAccess(up)
 		up.right = v
+		u.hierarchy.Push(up)
 		u.lastremove = right
 	}
 }
