@@ -80,7 +80,13 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		t.root = t.makeNode(BLACK, key, value)
 	} else {
 		inserting := t.makeNode(RED, key, value)
-		parent := t.guaranteeWriteAccess(anchor.hierarchy.Pop())
+		var parent *frbtNodeGKeyXXGValue
+		if anchor.at == nil {
+			parent = t.guaranteeWriteAccess(anchor.hierarchy.Pop())
+		} else {
+			parent = t.guaranteeWriteAccess(anchor.at)
+		}
+
 		if t.lessthan(key, *parent.key) {
 			parent.left = inserting
 		} else {
@@ -253,8 +259,9 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				sibling.color = BLACK
 				replacingParent.at.color = RED
 				//Need Debug
-				replacingParent.hierarchy.Pop()
+				//replacingParent.hierarchy.Pop()
 				t.leftRotateM(replacingParent)
+				replacingParent.at = replacingParent.hierarchy.Pop()
 				sibling = replacingParent.at.right
 			}
 
@@ -290,8 +297,9 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				sibling.color = BLACK
 				replacingParent.at.color = RED
 				//Need Debug
-				replacingParent.hierarchy.Pop()
+				//replacingParent.hierarchy.Pop()
 				t.rightRotateM(replacingParent)
+				replacingParent.at = replacingParent.hierarchy.Pop()
 				sibling = replacingParent.at.left
 			}
 
