@@ -252,6 +252,8 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 			if sibling.color == RED {
 				sibling.color = BLACK
 				replacingParent.at.color = RED
+				//Need Debug
+				replacingParent.hierarchy.Pop()
 				t.leftRotateM(replacingParent)
 				sibling = replacingParent.at.right
 			}
@@ -268,7 +270,8 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 					replacingParent.hierarchy.Push(replacingParent.at)
 					replacingParent.at = sibling
 					t.rightRotateM(replacingParent)
-					sibling = replacingParent.at.right
+					sibling = replacingParent.hierarchy.Pop()
+					replacingParent.at = replacingParent.hierarchy.Pop()
 				}
 				sibling.color = replacingParent.at.color
 				replacingParent.at.color = BLACK
@@ -286,6 +289,8 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 			if sibling.color == RED {
 				sibling.color = BLACK
 				replacingParent.at.color = RED
+				//Need Debug
+				replacingParent.hierarchy.Pop()
 				t.rightRotateM(replacingParent)
 				sibling = replacingParent.at.left
 			}
@@ -302,7 +307,8 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 					replacingParent.hierarchy.Push(replacingParent.at)
 					replacingParent.at = sibling
 					t.leftRotateM(replacingParent)
-					sibling = replacingParent.at.left
+					sibling = replacingParent.hierarchy.Pop()
+					replacingParent.at = replacingParent.hierarchy.Pop()
 				}
 				sibling.color = replacingParent.at.color
 				replacingParent.at.color = BLACK
