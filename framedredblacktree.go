@@ -268,6 +268,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
 				sibling.color = RED
 				anchor = replacingParent
+				continue
 			} else {
 				if effectiveColor(sibling.right) == BLACK {
 					if sibling.left != nil {
@@ -287,7 +288,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				}
 				replacingParent.hierarchy.Pop()
 				t.leftRotateM(replacingParent)
-
+				break
 			}
 		} else if anchor.lastremove == right {
 			sibling := replacingParent.at.left
@@ -306,6 +307,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
 				sibling.color = RED
 				anchor = replacingParent
+				continue
 			} else {
 				if effectiveColor(sibling.left) == BLACK {
 					if sibling.right != nil {
@@ -325,7 +327,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				}
 				replacingParent.hierarchy.Pop()
 				t.rightRotateM(replacingParent)
-
+				break
 			}
 		} else {
 			runtime.Breakpoint()
