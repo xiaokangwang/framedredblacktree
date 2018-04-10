@@ -267,7 +267,12 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
 				sibling.color = RED
+				replacingParent.at = replacingParent.hierarchy.Pop()
 				anchor = replacingParent
+				if replacingParent.at.color == RED {
+					replacingParent.at.color = BLACK
+					break
+				}
 				continue
 			} else {
 				if effectiveColor(sibling.right) == BLACK {
@@ -306,7 +311,12 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
 				sibling.color = RED
+				replacingParent.at = replacingParent.hierarchy.Pop()
 				anchor = replacingParent
+				if replacingParent.at.color == RED {
+					replacingParent.at.color = BLACK
+					break
+				}
 				continue
 			} else {
 				if effectiveColor(sibling.left) == BLACK {
