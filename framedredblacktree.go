@@ -152,7 +152,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		t.replacetreeelement(min, replacing)
 		anchor.lastremove = min.lastremove
 		if replacedOrigColor == BLACK {
-			t.deleteFixAscendD(anchor, anchor)
+			t.deleteFixAscendD(*min, *min)
 		}
 	}
 
@@ -252,6 +252,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 			replacingParent.at = anchor.hierarchy.Peek()
 		}
 		if anchor.lastremove == left {
+			if effectiveColor(replacingParent.at.left) == RED {
+				replacingParent.at.left.color = BLACK
+				return
+			}
 			sibling := replacingParent.at.right
 			sibling = t.guaranteeWriteAccess(sibling)
 			replacingParent.at.right = sibling
@@ -296,6 +300,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				break
 			}
 		} else if anchor.lastremove == right {
+			if effectiveColor(replacingParent.at.right) == RED {
+				replacingParent.at.right.color = BLACK
+				return
+			}
 			sibling := replacingParent.at.left
 			sibling = t.guaranteeWriteAccess(sibling)
 			replacingParent.at.left = sibling
@@ -492,7 +500,12 @@ func (t *FRBTreeGKeyXXGValue) Get(key GKey) (GValue, error) {
 func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
 	hierarchystack := newstackGKeyXXGValue()
 	current := t.root
+	var counter = 30
 	for {
+		counter--
+		if counter == 0 {
+			runtime.Breakpoint()
+		}
 		if current == nil {
 			return frbtAnchorGKeyXXGValue{at: nil, hierarchy: hierarchystack}
 		}
