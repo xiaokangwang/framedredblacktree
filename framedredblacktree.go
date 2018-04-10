@@ -71,7 +71,7 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		return ErrModDiversifiedFRBTreeGKeyXXGValue
 	}
 
-	anchor := t.narrowto(key)
+	anchor := t.narrowto(key, true)
 
 	t.size++
 
@@ -105,7 +105,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 	if !t.IsModifyAllowed() {
 		return ErrModDiversifiedFRBTreeGKeyXXGValue
 	}
-	anchor := t.narrowto(key)
+	anchor := t.narrowto(key, false)
 	if anchor.at == nil {
 		return ErrKeyNotFoundGKeyXXGValue
 	}
@@ -484,7 +484,7 @@ func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *f
 }
 
 func (t *FRBTreeGKeyXXGValue) Get(key GKey) (GValue, error) {
-	result := t.narrowto(key)
+	result := t.narrowto(key, false)
 	if result.at == nil {
 		return nil, ErrKeyNotFoundGKeyXXGValue
 	}
@@ -497,7 +497,7 @@ func (t *FRBTreeGKeyXXGValue) Get(key GKey) (GValue, error) {
          false if no exact match is found,
               with an stack topped with would be parents hierarchy
 */
-func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
+func (t *FRBTreeGKeyXXGValue) narrowto(key GKey, wishnew bool) frbtAnchorGKeyXXGValue {
 	hierarchystack := newstackGKeyXXGValue()
 	current := t.root
 	var counter = 30
@@ -513,7 +513,7 @@ func (t *FRBTreeGKeyXXGValue) narrowto(key GKey) frbtAnchorGKeyXXGValue {
 		if t.lessthan(key, *current.key) {
 			current = current.left
 		} else {
-			if *current.key == key {
+			if !wishnew && *current.key == key {
 				hierarchystack.Pop()
 				return frbtAnchorGKeyXXGValue{at: current, hierarchy: hierarchystack}
 			}
