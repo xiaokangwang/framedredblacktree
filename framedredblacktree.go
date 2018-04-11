@@ -72,7 +72,7 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 	}
 
 	anchor := t.narrowto(key, true)
-
+	t.guaranteeAncestorsWriteAccess(anchor)
 	t.size++
 
 	if anchor.hierarchy.Len() == 0 {
@@ -81,11 +81,8 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 	} else {
 		inserting := t.makeNode(RED, key, value)
 		var parent *frbtNodeGKeyXXGValue
-		if anchor.at == nil {
-			parent = t.guaranteeWriteAccess(anchor.hierarchy.Pop())
-		} else {
-			parent = t.guaranteeWriteAccess(anchor.at)
-		}
+
+		parent = t.guaranteeWriteAccess(anchor.hierarchy.Pop())
 
 		if t.lessthan(key, *parent.key) {
 			parent.left = inserting
@@ -500,7 +497,7 @@ func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a frbtAnchorGKeyXXGV
 checkfor:
 	for {
 		if a.hierarchy.Len() == 0 {
-			t.root = current
+			t.root = updatestack.Peek()
 			break checkfor
 		}
 		old := a.hierarchy.Pop()
@@ -514,8 +511,11 @@ checkfor:
 		} else if old.right == current {
 			new.right = current
 		} else {
-			runtime.Breakpoint()
+			if current != nil {
+				runtime.Breakpoint()
+			}
 		}
+		current = old
 		updatestack.Push(new)
 	}
 
