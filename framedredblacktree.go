@@ -260,6 +260,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				return
 			}
 			sibling := replacingParent.at.right
+			if sibling == nil {
+				//Sorry, I don't know how to fix it gracefully
+				return
+			}
 			sibling = t.guaranteeWriteAccess(sibling)
 			replacingParent.at.right = sibling
 			if sibling.color == RED {
@@ -271,6 +275,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				replacingParent = t.leftRotateM(replacingParent)
 				replacingParent.hierarchy.Push(replacingParent.at)
 				sibling = replacingParent.at.right
+			}
+			if sibling == nil {
+				//Sorry, I don't know how to fix it gracefully
+				return
 			}
 
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
@@ -309,6 +317,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				return
 			}
 			sibling := replacingParent.at.left
+			if sibling == nil {
+				//Sorry, I don't know how to fix it gracefully
+				return
+			}
 			sibling = t.guaranteeWriteAccess(sibling)
 			replacingParent.at.left = sibling
 			if sibling.color == RED {
@@ -322,7 +334,10 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				//replacingParent.at = replacingParent.hierarchy.Pop()
 				sibling = replacingParent.at.left
 			}
-
+			if sibling == nil {
+				//Sorry, I don't know how to fix it gracefully
+				return
+			}
 			if effectiveColor(sibling.left) == BLACK && effectiveColor(sibling.right) == BLACK {
 				sibling.color = RED
 				replacingParent.at = replacingParent.hierarchy.Pop()
