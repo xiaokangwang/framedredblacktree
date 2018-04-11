@@ -116,6 +116,7 @@ func (t *FRBTreeGKeyXXGValue) Drop(key GKey) error {
 		replacing := anchor.at.right
 		t.replacetreeelement(&anchor, replacing)
 		if anchor.lastremove == root {
+			t.root.color = BLACK
 			return nil
 		}
 		if replacedOrigColor == BLACK {
@@ -263,7 +264,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				sibling.color = BLACK
 				replacingParent.at.color = RED
 				//Need Debug
-				//replacingParent.hierarchy.Pop()
+				replacingParent.hierarchy.Pop()
 				t.leftRotateM(replacingParent)
 				replacingParent.at = replacingParent.hierarchy.Pop()
 				sibling = replacingParent.at.right
@@ -311,7 +312,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				sibling.color = BLACK
 				replacingParent.at.color = RED
 				//Need Debug
-				//replacingParent.hierarchy.Pop()
+				replacingParent.hierarchy.Pop()
 				t.rightRotateM(replacingParent)
 				replacingParent.at = replacingParent.hierarchy.Pop()
 				sibling = replacingParent.at.left
@@ -352,6 +353,33 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 		}
 	}
 
+}
+
+func (t *FRBTreeGKeyXXGValue) Verify() {
+	if t.root != nil && t.root.color == RED {
+		runtime.Breakpoint()
+	}
+	t.verify(t.root, 1)
+}
+
+func (t *FRBTreeGKeyXXGValue) verify(v *frbtNodeGKeyXXGValue, blackabove uint) uint {
+	if v == nil {
+		return blackabove + 1
+	}
+	if v.color == RED {
+		if !(effectiveColor(v.left) != RED && effectiveColor(v.right) != RED) {
+			runtime.Breakpoint()
+		}
+	}
+	if v.color == BLACK {
+		blackabove++
+	}
+	lb := t.verify(v.left, blackabove)
+	rb := t.verify(v.right, blackabove)
+	if lb != rb {
+		runtime.Breakpoint()
+	}
+	return lb
 }
 
 func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
