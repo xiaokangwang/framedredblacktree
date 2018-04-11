@@ -295,7 +295,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 					replacingParent.at.color = BLACK
 					break
 				}
-				continue
+				break
 			} else {
 				if effectiveColor(sibling.right) == BLACK {
 					if sibling.left != nil {
@@ -352,7 +352,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 					replacingParent.at.color = BLACK
 					break
 				}
-				continue
+				break
 			} else {
 				if effectiveColor(sibling.left) == BLACK {
 					if sibling.right != nil {
