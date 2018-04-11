@@ -82,7 +82,7 @@ func (t *FRBTreeGKeyXXGValue) Insert(key GKey, value GValue) error {
 		inserting := t.makeNode(RED, key, value)
 		var parent *frbtNodeGKeyXXGValue
 
-		parent = t.guaranteeWriteAccess(anchor.hierarchy.Pop())
+		parent = t.guaranteeWriteAccess(anchor.hierarchy.Pop(), nil)
 
 		if t.lessthan(key, *parent.key) {
 			parent.left = inserting
@@ -198,7 +198,7 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 		}
 		if parent == grandparent.left {
 			if grandparent.right != nil {
-				uncle = t.guaranteeWriteAccess(grandparent.right)
+				uncle = t.guaranteeWriteAccess(grandparent.right, nil)
 				grandparent.right = uncle
 				if uncle.color == RED {
 					reduncle(uncle)
@@ -220,7 +220,7 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 
 		} else if parent == grandparent.right {
 			if grandparent.left != nil {
-				uncle = t.guaranteeWriteAccess(grandparent.left)
+				uncle = t.guaranteeWriteAccess(grandparent.left, nil)
 				grandparent.left = uncle
 				if uncle.color == RED {
 					reduncle(uncle)
@@ -270,7 +270,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				//Sorry, I don't know how to fix it gracefully
 				return
 			}
-			sibling = t.guaranteeWriteAccess(sibling)
+			sibling = t.guaranteeWriteAccess(sibling, nil)
 			replacingParent.at.right = sibling
 			if sibling.color == RED {
 				sibling.color = BLACK
@@ -327,7 +327,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 				//Sorry, I don't know how to fix it gracefully
 				return
 			}
-			sibling = t.guaranteeWriteAccess(sibling)
+			sibling = t.guaranteeWriteAccess(sibling, nil)
 			replacingParent.at.left = sibling
 			if sibling.color == RED {
 				sibling.color = BLACK
@@ -426,8 +426,8 @@ func (t *FRBTreeGKeyXXGValue) walk(v *frbtNodeGKeyXXGValue) {
 
 func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
 	t.guaranteeAncestorsWriteAccess(anchor)
-	pGrave := t.guaranteeWriteAccess(anchor.at)
-	qGrave := t.guaranteeWriteAccess(anchor.at.right)
+	pGrave := t.guaranteeWriteAccess(anchor.at, nil)
+	qGrave := t.guaranteeWriteAccess(anchor.at.right, nil)
 
 	b := anchor.at.right.left
 
@@ -451,8 +451,8 @@ func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnc
 
 func (t *FRBTreeGKeyXXGValue) rightRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
 	t.guaranteeAncestorsWriteAccess(anchor)
-	qGrave := t.guaranteeWriteAccess(anchor.at)
-	pGrave := t.guaranteeWriteAccess(anchor.at.left)
+	qGrave := t.guaranteeWriteAccess(anchor.at, nil)
+	pGrave := t.guaranteeWriteAccess(anchor.at.left, nil)
 
 	b := anchor.at.left.right
 
@@ -482,13 +482,13 @@ func (t *FRBTreeGKeyXXGValue) replacetreeelement(u *frbtAnchorGKeyXXGValue, v *f
 		u.lastremove = root
 	} else if u.hierarchy.Peek().left == u.at {
 		up := u.hierarchy.Pop()
-		up = t.guaranteeWriteAccess(up)
+		up = t.guaranteeWriteAccess(up, nil)
 		up.left = v
 		u.hierarchy.Push(up)
 		u.lastremove = left
 	} else {
 		up := u.hierarchy.Pop()
-		up = t.guaranteeWriteAccess(up)
+		up = t.guaranteeWriteAccess(up, nil)
 		up.right = v
 		u.hierarchy.Push(up)
 		u.lastremove = right
@@ -550,9 +550,19 @@ checkfor:
 
 }
 
-func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue) *frbtNodeGKeyXXGValue {
+func (t *FRBTreeGKeyXXGValue) guaranteeWriteAccess(src *frbtNodeGKeyXXGValue, parent *frbtNodeGKeyXXGValue) *frbtNodeGKeyXXGValue {
 	if t.isShifted(src) {
-		return t.dupNode(src)
+		new := t.dupNode(src)
+		if parent != nil {
+			if src == parent.left {
+				parent.left = new
+			} else if src == parent.right {
+				parent.right = new
+			} else {
+				runtime.Breakpoint()
+			}
+		}
+		return new
 	}
 	return src
 }
