@@ -179,8 +179,13 @@ func effectiveColor(v *frbtNodeGKeyXXGValue) int {
 func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 	//https://www.geeksforgeeks.org/red-black-tree-set-2-insert/ step 3
 	t.guaranteeAncestorsWriteAccess(anchor)
-
+	var round = 1000
 	for anchor.hierarchy.Len() != 0 && anchor.hierarchy.Peek().color == RED {
+		round--
+		if round == 0 {
+			runtime.Breakpoint()
+		}
+
 		//small parent or big parent?
 		parent := anchor.hierarchy.Pop()
 		grandparent := anchor.hierarchy.Pop()
@@ -246,8 +251,12 @@ func (t *FRBTreeGKeyXXGValue) insertFixAscendD(anchor frbtAnchorGKeyXXGValue) {
 func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, replacingParent frbtAnchorGKeyXXGValue) {
 	//Arg 1 replacing, arg2 replaced parent
 	//t.guaranteeAncestorsWriteAccess(anchor)
-
+	var round = 1000
 	for anchor.at != t.root && effectiveColor(anchor.at) == BLACK {
+		round--
+		if round == 0 {
+			runtime.Breakpoint()
+		}
 		if anchor.at != nil {
 			replacingParent.at = anchor.hierarchy.Peek()
 		}
@@ -372,6 +381,7 @@ func (t *FRBTreeGKeyXXGValue) deleteFixAscendD(anchor frbtAnchorGKeyXXGValue, re
 
 }
 
+/*
 func (t *FRBTreeGKeyXXGValue) Verify() {
 	return
 	if t.root != nil && t.root.color == RED {
@@ -398,6 +408,20 @@ func (t *FRBTreeGKeyXXGValue) verify(v *frbtNodeGKeyXXGValue, blackabove uint) u
 		//runtime.Breakpoint()
 	}
 	return lb
+}
+*/
+func (t *FRBTreeGKeyXXGValue) Walk() {
+	t.walk(t.root)
+}
+
+func (t *FRBTreeGKeyXXGValue) walk(v *frbtNodeGKeyXXGValue) {
+	if v == nil {
+		return
+	}
+	t.walk(v.left)
+	t.walk(v.right)
+	print(*v.key)
+	return
 }
 
 func (t *FRBTreeGKeyXXGValue) leftRotateM(anchor frbtAnchorGKeyXXGValue) frbtAnchorGKeyXXGValue {
@@ -493,7 +517,7 @@ func (t *FRBTreeGKeyXXGValue) isShifted(src *frbtNodeGKeyXXGValue) bool {
 func (t *FRBTreeGKeyXXGValue) guaranteeAncestorsWriteAccess(a frbtAnchorGKeyXXGValue) {
 	updatestack := stackGKeyXXGValue{}
 	current := a.at
-
+	currentnew := a.at
 checkfor:
 	for {
 		if a.hierarchy.Len() == 0 {
@@ -507,15 +531,16 @@ checkfor:
 		}
 		new := t.dupNode(old)
 		if old.left == current {
-			new.left = current
+			new.left = currentnew
 		} else if old.right == current {
-			new.right = current
+			new.right = currentnew
 		} else {
 			if current != nil {
 				runtime.Breakpoint()
 			}
 		}
 		current = old
+		currentnew = new
 		updatestack.Push(new)
 	}
 
